@@ -1,0 +1,48 @@
+group 'xyz.nclsprsn'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'groovy'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.codehaus.groovy:groovy-all:2.3.11'
+    compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
+
+    compile group: 'org.slf4j', name:'slf4j-api', version: '1.7.22'
+
+    compile group: 'ch.qos.logback', name:'logback-classic', version: '1.1.9'
+    compile group: 'ch.qos.logback', name:'logback-core', version: '1.1.9'
+
+    compile group: 'org.apache.poi', name: 'poi', version: '3.15'
+
+    compile group:'commons-cli', name: 'commons-cli', version: '1.3'
+
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+}
+
+task runScript(type: JavaExec) {
+    description 'Run owl'
+
+    // Set main property to name of Groovy script class.
+    main = 'Owl'
+
+    // Set classpath for running the Groovy script.
+    classpath = sourceSets.main.runtimeClasspath
+
+    // Set parameters for runnning the Groovy script.
+    if(project.hasProperty('args')){
+        args project.args.split('\\s+')
+    }
+}
+
+task buildJar(type: Jar) {
+    from files(sourceSets.main.output.classesDir)
+    from configurations.runtime.asFileTree.files.collect { zipTree(it) }
+
+    manifest {
+        attributes 'Main-Class': 'Owl'
+    }
+}
